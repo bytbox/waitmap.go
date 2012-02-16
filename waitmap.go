@@ -25,7 +25,8 @@ func New() *WaitMap {
 }
 
 // Retrieves the value mapped to by k. If no such value is yet available, waits
-// until one is, and then returns that.
+// until one is, and then returns that. Otherwise, it returns the value
+// available at the time Get is called.
 func (m *WaitMap) Get(k interface{}) interface{} {
 	m.lock.Lock()
 	e, ok := m.ents[k]
@@ -40,6 +41,7 @@ func (m *WaitMap) Get(k interface{}) interface{} {
 		m.ents[k] = e
 	}
 	m.lock.Unlock()
+	if e.ok { return e.data }
 	e.mutx.Lock()
 	defer e.mutx.Unlock()
 	e.cond.Wait()

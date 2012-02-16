@@ -5,6 +5,15 @@ import (
 )
 
 func TestFlatGet(t *testing.T) {
+	m := New()
+	m.Set(1, 2)
+	m.Set(2, 3)
+	if m.Get(1) != 2 {
+		t.Errorf("Wrong result from Get(1)")
+	}
+	if m.Get(2) != 3 {
+		t.Errorf("Wrong result from Get(2)")
+	}
 }
 
 func TestFlatCheck(t *testing.T) {
@@ -23,5 +32,18 @@ func TestFlatCheck(t *testing.T) {
 }
 
 func TestSimple(t *testing.T) {
-
+	m := New()
+	var v interface{}
+	c := make(chan interface{})
+	go func() {
+		v = m.Get(1)
+		c <- nil
+	}()
+	go func() {
+		m.Set(1, "hi")
+	}()
+	<-c
+	if v != "hi" {
+		t.Errorf("m.Get(1) returned incorrect valeu")
+	}
 }
