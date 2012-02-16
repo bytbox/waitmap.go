@@ -5,6 +5,8 @@ import (
 	"sync"
 )
 
+// An entry in a WaitMap. Note that mutx and cond may legally be nil - this
+// avoids heavy allocations at the cost of some code complexity.
 type entry struct {
 	mutx *sync.Mutex
 	cond *sync.Cond
@@ -41,6 +43,9 @@ func (m *WaitMap) Get(k interface{}) interface{} {
 		m.ents[k] = e
 	}
 	m.lock.Unlock()
+
+	// If e.ok is true, e.data exists and can never cease to exist. We need
+	// this check to avoid using a nil e.mutx. We could also actually check e.mutx to see if it's nil, but this accomplishes the same thing and will be slightly faster on average (since we will often avoid unnecessarily messing with the mutex).
 	if e.ok { return e.data }
 	e.mutx.Lock()
 	defer e.mutx.Unlock()
