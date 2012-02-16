@@ -67,8 +67,10 @@ func (m *WaitMap) Set(k interface{}, v interface{}) {
 		return
 	}
 	e.data = v
-	e.ok = true
-	e.cond.Broadcast()
+	if !e.ok {
+		e.ok = true
+		e.cond.Broadcast()
+	}
 }
 
 // Returns true if k is a key in the map.
