@@ -47,3 +47,41 @@ func TestSimple(t *testing.T) {
 		t.Errorf("m.Get(1) returned incorrect valeu")
 	}
 }
+
+func BenchmarkFlatFailedCheck(b *testing.B) {
+	m := New()
+	for i := 0; i < b.N; i++ {
+		m.Check(0)
+	}
+}
+
+func BenchmarkFlatWaitedGet(b *testing.B) {
+	m := New()
+	go func() { m.Get(0) }()
+	m.Set(0, "ho")
+	for i := 0; i < b.N; i++ {
+		m.Get(0)
+	}
+}
+
+func BenchmarkFlatSimpleGet(b *testing.B) {
+	m := New()
+	m.Set(0, "ho")
+	for i := 0; i < b.N; i++ {
+		m.Get(0)
+	}
+}
+
+func BenchmarkFlatSimpleSet(b *testing.B) {
+	m := New()
+	for i := 0; i < b.N; i++ {
+		m.Set(0, 0)
+	}
+}
+
+func BenchmarkFlatIncrementalSet(b *testing.B) {
+	m := New()
+	for i := 0; i < b.N; i++ {
+		m.Set(i, 0)
+	}
+}
