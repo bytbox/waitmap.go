@@ -54,6 +54,7 @@ func (m *WaitMap) Set(k interface{}, v interface{}) {
 	if !ok {
 		e := &entry{nil, nil, v, true}
 		m.ents[k] = e
+		return
 	}
 	e.data = v
 	e.ok = true
