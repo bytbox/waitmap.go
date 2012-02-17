@@ -5,6 +5,8 @@ import (
 	"sync"
 )
 
+// TODO use sync/atomic wherever possible
+
 // An entry in a WaitMap. Note that mutx and cond may legally be nil - this
 // avoids heavy allocations at the cost of some code complexity.
 type entry struct {
