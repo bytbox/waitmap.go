@@ -78,8 +78,8 @@ func (m *WaitMap) Set(k interface{}, v interface{}) {
 // Returns true if k is a key in the map.
 func (m *WaitMap) Check(k interface{}) bool {
 	m.lock.Lock()
-	defer m.lock.Unlock()
 	e, ok := m.ents[k]
+	m.lock.Unlock()
 	if !ok {
 		return false
 	}

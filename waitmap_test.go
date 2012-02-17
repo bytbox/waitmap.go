@@ -64,6 +64,14 @@ func BenchmarkRawMapSet(b *testing.B) {
 	}
 }
 
+func BenchmarkFlatGoodCheck(b *testing.B) {
+	m := New()
+	m.Set(0, 0)
+	for i := 0; i < b.N; i++ {
+		m.Check(0)
+	}
+}
+
 func BenchmarkFlatFailedCheck(b *testing.B) {
 	m := New()
 	for i := 0; i < b.N; i++ {
