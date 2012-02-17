@@ -48,6 +48,22 @@ func TestSimple(t *testing.T) {
 	}
 }
 
+func BenchmarkRawMapGet(b *testing.B) {
+	m := map[string]string{
+		"foo": "bar",
+	}
+	for i := 0; i < b.N; i++ {
+		_, _ = m["foo"]
+	}
+}
+
+func BenchmarkRawMapSet(b *testing.B) {
+	m := map[string]string{}
+	for i := 0; i < b.N; i++ {
+		m["foo"] = "bar"
+	}
+}
+
 func BenchmarkFlatFailedCheck(b *testing.B) {
 	m := New()
 	for i := 0; i < b.N; i++ {
