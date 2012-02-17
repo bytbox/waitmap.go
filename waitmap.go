@@ -70,12 +70,14 @@ func (m *WaitMap) Set(k interface{}, v interface{}) {
 		m.lock.Unlock()
 		return
 	}
+	e.mutx.Lock()
+	m.lock.Unlock()
 	e.data = v
 	if !e.ok {
 		e.ok = true
 		e.cond.Broadcast()
 	}
-	m.lock.Unlock()
+	e.mutx.Unlock()
 }
 
 // Returns true if k is a key in the map.
