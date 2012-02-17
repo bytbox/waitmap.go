@@ -53,19 +53,19 @@ func (m *WaitMap) Get(k interface{}) interface{} {
 		return e.data
 	}
 	e.mutx.Lock()
-	defer e.mutx.Unlock()
 	e.cond.Wait()
+	e.mutx.Unlock()
 	return e.data
 }
 
 // Maps the given key and value, waking any waiting calls to Get.
 func (m *WaitMap) Set(k interface{}, v interface{}) {
 	m.lock.Lock()
-	defer m.lock.Unlock()
 	e, ok := m.ents[k]
 	if !ok {
 		e := &entry{nil, nil, v, true}
 		m.ents[k] = e
+		m.lock.Unlock()
 		return
 	}
 	e.data = v
@@ -73,6 +73,7 @@ func (m *WaitMap) Set(k interface{}, v interface{}) {
 		e.ok = true
 		e.cond.Broadcast()
 	}
+	m.lock.Unlock()
 }
 
 // Returns true if k is a key in the map.
