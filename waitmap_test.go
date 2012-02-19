@@ -48,6 +48,18 @@ func TestSimple(t *testing.T) {
 	}
 }
 
+func TestMultipleSet(t *testing.T) {
+	m := New()
+	a := m.Set(1, "HI")
+	b := m.Set(1, "HI")
+	if a != true {
+		t.Errorf("m.Set(1) inappropriately returned false")
+	}
+	if b == true {
+		t.Errorf("m.Set(1) inappropriately returned true")
+	}
+}
+
 func BenchmarkRawMapGet(b *testing.B) {
 	m := map[string]string{
 		"foo": "bar",

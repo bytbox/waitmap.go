@@ -60,24 +60,28 @@ func (m *WaitMap) Get(k interface{}) interface{} {
 	return e.data
 }
 
-// Maps the given key and value, waking any waiting calls to Get.
-func (m *WaitMap) Set(k interface{}, v interface{}) {
+// Maps the given key and value, waking any waiting calls to Get. Returns false
+// (and changes nothing) if the key is already in the map.
+func (m *WaitMap) Set(k interface{}, v interface{}) bool {
 	m.lock.Lock()
 	e, ok := m.ents[k]
 	if !ok {
 		e := &entry{nil, nil, v, true}
 		m.ents[k] = e
 		m.lock.Unlock()
-		return
+		return true
+	}
+	if e.ok {
+		m.lock.Unlock()
+		return false
 	}
 	e.mutx.Lock()
 	m.lock.Unlock()
 	e.data = v
-	if !e.ok {
-		e.ok = true
-		e.cond.Broadcast()
-	}
+	e.ok = true
+	e.cond.Broadcast()
 	e.mutx.Unlock()
+	return true
 }
 
 // Returns true if k is a key in the map.
