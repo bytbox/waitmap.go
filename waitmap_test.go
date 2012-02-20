@@ -69,13 +69,6 @@ func BenchmarkRawMapGet(b *testing.B) {
 	}
 }
 
-func BenchmarkRawMapSet(b *testing.B) {
-	m := map[string]string{}
-	for i := 0; i < b.N; i++ {
-		m["foo"] = "bar"
-	}
-}
-
 func BenchmarkFlatGoodCheck(b *testing.B) {
 	m := New()
 	m.Set(0, 0)
@@ -108,16 +101,30 @@ func BenchmarkFlatSimpleGet(b *testing.B) {
 	}
 }
 
+func BenchmarkRawSimpleSet(b *testing.B) {
+	m := map[int]int{}
+	for i := 0; i < b.N; i++ {
+		m[0] = i
+	}
+}
+
+func BenchmarkRawIncrementalSet(b *testing.B) {
+	m := map[int]int{}
+	for i := 0; i < b.N; i++ {
+		m[i] = i
+	}
+}
+
 func BenchmarkFlatSimpleSet(b *testing.B) {
 	m := New()
 	for i := 0; i < b.N; i++ {
-		m.Set(0, 0)
+		m.Set(0, i)
 	}
 }
 
 func BenchmarkFlatIncrementalSet(b *testing.B) {
 	m := New()
 	for i := 0; i < b.N; i++ {
-		m.Set(i, 0)
+		m.Set(i, i)
 	}
 }

@@ -7,8 +7,7 @@ import (
 
 // TODO use sync/atomic wherever possible
 
-// An entry in a WaitMap. Note that mutx and cond may legally be nil - this
-// avoids heavy allocations at the cost of some code complexity.
+// An entry in a WaitMap.
 type entry struct {
 	mutx *sync.Mutex
 	cond *sync.Cond
@@ -25,6 +24,13 @@ func New() *WaitMap {
 	return &WaitMap{
 		lock: new(sync.Mutex),
 		ents: make(map[interface{}]*entry),
+	}
+}
+
+func NewCap(c int) *WaitMap {
+	return &WaitMap{
+		lock: new(sync.Mutex),
+		ents: make(map[interface{}]*entry, c),
 	}
 }
 
@@ -66,7 +72,13 @@ func (m *WaitMap) Set(k interface{}, v interface{}) bool {
 	m.lock.Lock()
 	e, ok := m.ents[k]
 	if !ok {
-		e := &entry{nil, nil, v, true}
+		mutx := new(sync.Mutex)
+		e := &entry{
+			mutx: mutx,
+			cond: sync.NewCond(mutx),
+			data: v,
+			ok:   true,
+		}
 		m.ents[k] = e
 		m.lock.Unlock()
 		return true
